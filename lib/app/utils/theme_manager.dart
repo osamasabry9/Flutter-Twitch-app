@@ -17,7 +17,12 @@ ThemeData getApplicationTheme() {
     disabledColor: ColorManager.grey1,
     splashColor: ColorManager.lightPrimary,
     scaffoldBackgroundColor: ColorManager.background,
-
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: ColorManager.darkGrey,
+      selectedItemColor: ColorManager.primary,
+      unselectedItemColor: ColorManager.grey1,
+      type: BottomNavigationBarType.fixed,
+    ),
     // cardView theme
     cardTheme: const CardTheme(
       color: ColorManager.darkGrey,
@@ -74,7 +79,7 @@ ThemeData getApplicationTheme() {
         color: ColorManager.white,
         fontSize: FontSize.s22.sp,
       ),
-       displaySmall: getSemBoldStyle(
+      displaySmall: getSemBoldStyle(
         color: ColorManager.white,
         fontSize: FontSize.s18.sp,
       ),
