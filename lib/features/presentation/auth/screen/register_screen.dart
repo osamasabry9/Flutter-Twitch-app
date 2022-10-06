@@ -36,7 +36,7 @@ class RegisterScreen extends StatelessWidget {
               value: state.uId,
             ).then((value) async {
               showSnackBar(context, 'Welcome in Twitch App');
-              Navigator.pushReplacementNamed(context, Routes.homeRoute);
+              Navigator.pushReplacementNamed(context, Routes.mainRoute);
             });
           }
         },
