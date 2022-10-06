@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:twitch_clone/app/utils/color_manager.dart';
 import 'package:twitch_clone/app/utils/values_manager.dart';
@@ -64,6 +63,7 @@ class InputField extends StatelessWidget {
               obscureText: isPassword,
               validator: validate,
               maxLines: maxLine,
+              style: style,
               onFieldSubmitted: onFieldSubmitted,
               decoration: InputDecoration(
                 hintText: hint,

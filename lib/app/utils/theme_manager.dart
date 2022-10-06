@@ -116,21 +116,21 @@ ThemeData getApplicationTheme() {
       enabledBorder: const OutlineInputBorder(
         borderSide:
             BorderSide(color: ColorManager.darkGrey, width: AppSize.s1_5),
-        borderRadius: BorderRadius.all(Radius.circular(AppSize.s20)),
+        borderRadius: BorderRadius.all(Radius.circular(AppSize.s14)),
       ),
       focusedBorder: const OutlineInputBorder(
         borderSide:
             BorderSide(color: ColorManager.primary, width: AppSize.s1_5),
-        borderRadius: BorderRadius.all(Radius.circular(AppSize.s20)),
+        borderRadius: BorderRadius.all(Radius.circular(AppSize.s14)),
       ),
       errorBorder: const OutlineInputBorder(
         borderSide: BorderSide(color: ColorManager.error, width: AppSize.s1_5),
-        borderRadius: BorderRadius.all(Radius.circular(AppSize.s20)),
+        borderRadius: BorderRadius.all(Radius.circular(AppSize.s14)),
       ),
       focusedErrorBorder: const OutlineInputBorder(
         borderSide:
             BorderSide(color: ColorManager.primary, width: AppSize.s1_5),
-        borderRadius: BorderRadius.all(Radius.circular(AppSize.s20)),
+        borderRadius: BorderRadius.all(Radius.circular(AppSize.s14)),
       ),
     ),
   );
