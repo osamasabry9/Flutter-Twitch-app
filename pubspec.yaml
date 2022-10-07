@@ -19,11 +19,12 @@ dependencies:
   firebase_auth: ^3.10.0
   cloud_firestore: ^3.4.9
   firebase_storage: ^10.3.9
-  equatable: ^2.0.5
   flutter_bloc: ^8.1.1
   shared_preferences: ^2.0.15
   dotted_border: ^2.0.0+2
-  file_picker: ^5.2.0+1
+  image_picker: ^0.8.6
+  agora_rtc_engine: ^6.0.0
+  permission_handler: ^10.1.0
   
 dev_dependencies:
   flutter_test:
