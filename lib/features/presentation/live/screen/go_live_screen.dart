@@ -1,102 +1,109 @@
-import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twitch_clone/app/utils/color_manager.dart';
 import 'package:twitch_clone/app/utils/font_manager.dart';
+import 'package:twitch_clone/app/utils/routes_manager.dart';
 import 'package:twitch_clone/app/utils/styles_manager.dart';
 import 'package:twitch_clone/app/utils/values_manager.dart';
 import 'package:twitch_clone/app/widgets/input_field.dart';
 import 'package:twitch_clone/app/widgets/main_button.dart';
-import 'package:twitch_clone/app/widgets/pick_image.dart';
+import 'package:twitch_clone/app/widgets/show_snack_bar.dart';
+import 'package:twitch_clone/features/presentation/live/cubit/go_live_cubit.dart';
+import 'package:twitch_clone/features/presentation/live/cubit/go_live_state.dart';
+import 'package:twitch_clone/features/presentation/live/widgets/botted_border_widget.dart';
 
-class GoLiveScreen extends StatefulWidget {
-  const GoLiveScreen({super.key});
+class GoLiveScreen extends StatelessWidget {
+  GoLiveScreen({super.key});
+  TextEditingController titleController = TextEditingController();
 
-  @override
-  State<GoLiveScreen> createState() => _GoLiveScreenState();
-}
-
-class _GoLiveScreenState extends State<GoLiveScreen> {
   @override
   Widget build(BuildContext context) {
-    TextEditingController titleController = TextEditingController();
-    Uint8List? image;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(AppPadding.p12),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: () async {
-                Uint8List? pickedImage = await pickImage();
-                if (pickedImage != null) {
-                  setState(() {
-                    image = pickedImage;
-                  });
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppPadding.p8,
-                  vertical: AppPadding.p20,
+    
+    return BlocConsumer<GoLiveCubit, GoLiveState>(
+      listener: (context, state) {
+        if (state is GoLiveSuccessState) {
+          showSnackBar(context, 'Live stream has started successfully !');
+          Navigator.pushNamed(context, Routes.mainRoute);
+        }else if (state is GoLiveErrorState){
+          showSnackBar(context, state.error);
+          Navigator.pushNamed(context, Routes.mainRoute);
+        }
+      },
+      builder: (context, state) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppPadding.p12),
+            child: Column(
+              children: [
+                if (state is GoLiveUploadImageLoadingState)
+                  LinearProgressIndicator(
+                    color: ColorManager.primary,
+                    backgroundColor: ColorManager.primary.withOpacity(0.5),
+                  ),
+                if (state is GoLiveUploadImageLoadingState)
+                  const SizedBox(
+                    height: 10,
+                  ),
+                GestureDetector(
+                  onTap: () async {
+                    GoLiveCubit.get(context).getPostImage();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppPadding.p8,
+                      vertical: AppPadding.p20,
+                    ),
+                    child: GoLiveCubit.get(context).postImage != null
+                        ? showImageWidget(context)
+                        : const BottedBorderWidget(),
+                  ),
                 ),
-                child: image != null
-                    ? SizedBox(
-                        height: AppSize.s150,
-                        child: Image.memory(image),
-                      )
-                    : DottedBorder(
-                        borderType: BorderType.RRect,
-                        radius: const Radius.circular(AppSize.s12),
-                        dashPattern: const [10, 4],
-                        strokeCap: StrokeCap.round,
-                        color: ColorManager.primary,
-                        child: Container(
-                          height: AppSize.s150,
+                const SizedBox(height: AppSize.s12),
+                InputField(
+                  label: 'Title',
+                  textController: titleController,
+                  style: getMediumStyle(
+                      color: ColorManager.grey, fontSize: FontSize.s20),
+                  validate: (value) {
+                    return null;
+                  },
+                ),
+                const Spacer(),
+                MainButton(
+                  onTap: () {
+                    if (GoLiveCubit.get(context).postImage == null) {
+                      GoLiveCubit.get(context).createStream(
+                        title: titleController.text,
+                      );
+                    } else {
+                      GoLiveCubit.get(context).uploadLiveImage(
+                        text: titleController.text,
+                      );
+                    }
+                  },
+                  title: 'Go Live!',
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Container showImageWidget(BuildContext context) {
+    return Container(
+                          height: 150,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(AppSize.s12),
-                            color: ColorManager.primary.withOpacity(0.05),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.folder_open,
-                                size: AppSize.s40,
-                                color: ColorManager.primary,
+                              borderRadius: BorderRadius.circular(
+                                4,
                               ),
-                              const SizedBox(height: AppSize.s12),
-                              Text(
-                                'Select your thumbnail',
-                                style: getMediumStyle(
-                                    color: ColorManager.grey,
-                                    fontSize: FontSize.s18),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(height: AppSize.s12),
-            InputField(
-              label: 'Title',
-              textController: titleController,
-              style: getMediumStyle(
-                  color: ColorManager.grey, fontSize: FontSize.s20),
-              validate: (value) {
-                return null;
-              },
-            ),
-            const Spacer(),
-            MainButton(
-              onTap: () {},
-              title: 'Go Live!',
-            )
-          ],
-        ),
-      ),
-    );
+                              image: DecorationImage(
+                                image: FileImage(
+                                    GoLiveCubit.get(context).postImage!),
+                                fit: BoxFit.cover,
+                              )),
+                        );
   }
 }
