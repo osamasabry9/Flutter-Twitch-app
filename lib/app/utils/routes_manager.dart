@@ -46,7 +46,7 @@ class RouteGenerator {
         );
         case Routes.goLiveRoute:
         return MaterialPageRoute(
-          builder: (_) =>   GoLiveScreen(),
+          builder: (_) =>   const GoLiveScreen(),
         );
          case Routes.browserRoute:
         return MaterialPageRoute(

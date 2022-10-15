@@ -33,10 +33,10 @@ class _MainScreenState extends State<MainScreen>
       body: TabBarView(
         controller: _tabController,
         physics: const NeverScrollableScrollPhysics(),
-        children:  [
-          const HomeScreen(),
+        children: const [
+          HomeScreen(),
           GoLiveScreen(),
-          const BrowserScreen(),
+          BrowserScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

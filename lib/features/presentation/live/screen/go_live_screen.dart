@@ -8,24 +8,32 @@ import 'package:twitch_clone/app/utils/values_manager.dart';
 import 'package:twitch_clone/app/widgets/input_field.dart';
 import 'package:twitch_clone/app/widgets/main_button.dart';
 import 'package:twitch_clone/app/widgets/show_snack_bar.dart';
+import 'package:twitch_clone/features/presentation/broadcast/broadcast_screen.dart';
 import 'package:twitch_clone/features/presentation/live/cubit/go_live_cubit.dart';
 import 'package:twitch_clone/features/presentation/live/cubit/go_live_state.dart';
 import 'package:twitch_clone/features/presentation/live/widgets/botted_border_widget.dart';
 
 class GoLiveScreen extends StatelessWidget {
-  GoLiveScreen({super.key});
-  TextEditingController titleController = TextEditingController();
+  const GoLiveScreen({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
-    
+    TextEditingController titleController = TextEditingController();
     return BlocConsumer<GoLiveCubit, GoLiveState>(
       listener: (context, state) {
         if (state is GoLiveSuccessState) {
           showSnackBar(context, 'Live stream has started successfully !');
-          Navigator.pushNamed(context, Routes.mainRoute);
-        }else if (state is GoLiveErrorState){
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => BroadcastScreen(
+              isBroadcaster: true,
+              channelId: GoLiveCubit.get(context).channelId,
+              userAccount: GoLiveCubit.get(context).userModel!,
+            ),
+          ));
+        } else if (state is GoLiveErrorState) {
           showSnackBar(context, state.error);
+
           Navigator.pushNamed(context, Routes.mainRoute);
         }
       },
@@ -93,17 +101,16 @@ class GoLiveScreen extends StatelessWidget {
 
   Container showImageWidget(BuildContext context) {
     return Container(
-                          height: 150,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                4,
-                              ),
-                              image: DecorationImage(
-                                image: FileImage(
-                                    GoLiveCubit.get(context).postImage!),
-                                fit: BoxFit.cover,
-                              )),
-                        );
+      height: 150,
+      width: double.infinity,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(
+            4,
+          ),
+          image: DecorationImage(
+            image: FileImage(GoLiveCubit.get(context).postImage!),
+            fit: BoxFit.cover,
+          )),
+    );
   }
 }

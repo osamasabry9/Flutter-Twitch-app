@@ -3,13 +3,16 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:twitch_clone/app/utils/constants_manager.dart';
 import 'package:twitch_clone/features/data/model/live_stream.dart';
+import 'package:twitch_clone/features/data/model/message_model.dart';
 import 'package:twitch_clone/features/data/model/user_model.dart';
 import 'package:twitch_clone/features/presentation/live/cubit/go_live_state.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:uuid/uuid.dart';
 
 class GoLiveCubit extends Cubit<GoLiveState> {
   GoLiveCubit() : super(GoLiveInitialState());
@@ -49,28 +52,30 @@ class GoLiveCubit extends Cubit<GoLiveState> {
 
   void uploadLiveImage({
     required String text,
-  })async {
+  }) async {
     emit(GoLiveUploadImageLoadingState());
-    if(!((await FirebaseFirestore.instance
-        .collection('liveStream')
-        .doc('${userModel!.uId}${userModel!.username}').get()).exists))
-   { firebase_storage.FirebaseStorage.instance
-        .ref()
-        .child('liveStream-thumbnail')
-        .child(AppConstants.uId!)
-        .putFile(postImage!)
-        .then((value) {
-      value.ref.getDownloadURL().then((value) {
-        print(value);
-        createStream(title: text, postImage: value);
-      }).catchError((onError) {
-        emit(GoLiveUploadImageErrorState(onError));
+    if (!((await FirebaseFirestore.instance
+            .collection('liveStream')
+            .doc('${userModel!.uId}${userModel!.username}')
+            .get())
+        .exists)) {
+      firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('liveStream-thumbnail')
+          .child(AppConstants.uId!)
+          .putFile(postImage!)
+          .then((value) {
+        value.ref.getDownloadURL().then((value) {
+          print(value);
+          createStream(title: text, postImage: value);
+        }).catchError((onError) {
+          emit(GoLiveUploadImageErrorState(onError));
+        });
+      }).catchError((error) {
+        emit(GoLiveUploadImageErrorState(error));
       });
-    }).catchError((error) {
-      emit(GoLiveUploadImageErrorState(error));
-    });}
-    else{
-       emit(GoLiveErrorState('Two live stream cannot start at the same time.'));
+    } else {
+      emit(GoLiveErrorState('Two live stream cannot start at the same time.'));
     }
   }
 
@@ -105,5 +110,75 @@ class GoLiveCubit extends Cubit<GoLiveState> {
   void removePostImage() {
     postImage = null;
     emit(GoLiveImageRemoveState());
+  }
+
+  Future<void> endLiveStream(String channel) async {
+    await FirebaseFirestore.instance
+        .collection('liveStream')
+        .doc(channel)
+        .delete()
+        .then((value) => debugPrint('delete live stream 1 '))
+        .catchError((onError) {
+      debugPrint(onError.toString());
+    });
+  }
+
+  Future<void> updateViewCount(String id, bool isIncrease) async {
+    await FirebaseFirestore.instance
+        .collection('liveStream')
+        .doc(id)
+        .update({
+          'viewers': FieldValue.increment(isIncrease ? 1 : -1),
+        })
+        .then((value) => debugPrint('update View Count'))
+        .catchError((onError) {
+          debugPrint(onError.toString());
+        });
+  }
+
+  void sendMessage({
+    required String id,
+    required String text,
+  }) {
+    String commentId = const Uuid().v1();
+    MessageModel model = MessageModel(
+      uId: userModel!.uId,
+      commentId: commentId,
+      message: text,
+      username: userModel!.username,
+      startedAt: DateTime.now().toString(),
+    );
+
+    FirebaseFirestore.instance
+        .collection('liveStream')
+        .doc(id)
+        .collection('comments')
+        .doc(commentId)
+        .set(model.toMap())
+        .then((value) {
+      emit(GoLiveSendChatSuccessState());
+    }).catchError((onError) {
+      emit(GoLiveSendChatErrorState(onError.toString()));
+    });
+  }
+
+  List<MessageModel> messages = [];
+  void getMessage({
+    required String id,
+  }) {
+    emit(GoLiveChatLoadingState());
+    FirebaseFirestore.instance
+        .collection('liveStream')
+        .doc(id)
+        .collection('comments')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .listen((event) {
+      event.docs.forEach((element) {
+        messages.add(MessageModel.fromJson(element.data()));
+      });
+      debugPrint("$messages");
+      emit(GoLiveChatSuccessState());
+    });
   }
 }

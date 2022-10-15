@@ -40,4 +40,21 @@ class GoLiveUploadImageErrorState extends GoLiveState {
 
   GoLiveUploadImageErrorState(this.error);
 }
+// send chat 
+class GoLiveSendChatLoadingState extends GoLiveState {}
+class GoLiveSendChatSuccessState extends GoLiveState {}
+class GoLiveSendChatErrorState extends GoLiveState {
+  final String error;
+
+  GoLiveSendChatErrorState(this.error);
+}
+
+//  get chat 
+class GoLiveChatLoadingState extends GoLiveState {}
+class GoLiveChatSuccessState extends GoLiveState {}
+class GoLiveChatErrorState extends GoLiveState {
+  final String error;
+
+  GoLiveChatErrorState(this.error);
+}
 
