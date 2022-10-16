@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twitch_clone/app/utils/color_manager.dart';
@@ -19,6 +21,7 @@ class ChatWidget extends StatefulWidget {
 
 class _ChatWidgetState extends State<ChatWidget> {
   final TextEditingController textController = TextEditingController();
+
   @override
   void dispose() {
     textController.dispose();
@@ -28,7 +31,6 @@ class _ChatWidgetState extends State<ChatWidget> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GoLiveCubit, GoLiveState>(
-      
       builder: (context, state) {
         GoLiveCubit.get(context).getMessage(id: widget.channelId);
         return SizedBox(
@@ -36,8 +38,7 @@ class _ChatWidgetState extends State<ChatWidget> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-             state is GoLiveChatLoadingState
-                ? const Center(child: CircularProgressIndicator()) :Expanded(
+              Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
@@ -47,18 +48,22 @@ class _ChatWidgetState extends State<ChatWidget> {
                         alignment: AlignmentDirectional.centerEnd,
                         bottomEnd: 0.0,
                         bottomStart: 10.0,
-                        color: ColorManager.primary,
+                        color: ColorManager.grey,
                         message:
                             GoLiveCubit.get(context).messages[index].message,
+                        userName:
+                            GoLiveCubit.get(context).messages[index].username,
                       );
                     } else {
                       return buildMessage(
                         alignment: AlignmentDirectional.centerStart,
                         bottomEnd: 10.0,
                         bottomStart: 0.0,
-                        color: ColorManager.grey,
+                        color: ColorManager.primary,
                         message:
                             GoLiveCubit.get(context).messages[index].message,
+                        userName:
+                            GoLiveCubit.get(context).messages[index].username,
                       );
                     }
                   },
@@ -100,12 +105,13 @@ class _ChatWidgetState extends State<ChatWidget> {
     required double bottomStart,
     required Color color,
     required String message,
+    required String userName,
   }) {
     return Align(
       alignment: alignment,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.red,
+          color: color,
           borderRadius: BorderRadiusDirectional.only(
             bottomEnd: Radius.circular(bottomEnd),
             bottomStart: Radius.circular(bottomStart),
@@ -114,7 +120,21 @@ class _ChatWidgetState extends State<ChatWidget> {
           ),
         ),
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        child: Text(message),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              userName,
+              style: getMediumStyle(
+                  color: ColorManager.white, fontSize: FontSize.s16),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(message),
+          ],
+        ),
       ),
     );
   }

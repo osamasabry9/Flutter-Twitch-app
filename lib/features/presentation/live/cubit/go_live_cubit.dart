@@ -115,9 +115,30 @@ class GoLiveCubit extends Cubit<GoLiveState> {
   Future<void> endLiveStream(String channel) async {
     await FirebaseFirestore.instance
         .collection('liveStream')
+        .doc(channelId)
+        .collection('comments')
+        .get()
+        .then((value) {
+      for (int i = 0; i < value.docs.length; i++) {
+        FirebaseFirestore.instance
+            .collection('liveStream')
+            .doc(channelId)
+            .collection('comments')
+            .doc(
+              ((value.docs[i].data() as dynamic)['commentId']),
+            )
+            .delete();
+      }
+      debugPrint('delete live stream comments ');
+    }).catchError((onError) {
+      debugPrint(onError.toString());
+    });
+
+    await FirebaseFirestore.instance
+        .collection('liveStream')
         .doc(channel)
         .delete()
-        .then((value) => debugPrint('delete live stream 1 '))
+        .then((value) => debugPrint('delete live stream  '))
         .catchError((onError) {
       debugPrint(onError.toString());
     });
@@ -171,9 +192,10 @@ class GoLiveCubit extends Cubit<GoLiveState> {
         .collection('liveStream')
         .doc(id)
         .collection('comments')
-        .orderBy('createdAt', descending: true)
+        .orderBy('startedAt', descending: true)
         .snapshots()
         .listen((event) {
+           messages = [];
       event.docs.forEach((element) {
         messages.add(MessageModel.fromJson(element.data()));
       });
@@ -181,4 +203,5 @@ class GoLiveCubit extends Cubit<GoLiveState> {
       emit(GoLiveChatSuccessState());
     });
   }
+
 }

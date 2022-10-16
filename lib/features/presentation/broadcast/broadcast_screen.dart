@@ -211,7 +211,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                     ),
                   ],
                 ),
-               Expanded(child: ChatWidget(channelId: widget.channelId, user : user)),
+              Expanded(child: ChatWidget(channelId: widget.channelId, user : user)),
             ],
           ),
         ),
