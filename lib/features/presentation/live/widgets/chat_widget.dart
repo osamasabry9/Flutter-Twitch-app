@@ -33,8 +33,9 @@ class _ChatWidgetState extends State<ChatWidget> {
     return BlocBuilder<GoLiveCubit, GoLiveState>(
       builder: (context, state) {
         GoLiveCubit.get(context).getMessage(id: widget.channelId);
+        final size = MediaQuery.of(context).size;
         return SizedBox(
-          width: double.infinity,
+          width: size.width > 600 ? size.width * 0.25 : double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -90,7 +91,7 @@ class _ChatWidgetState extends State<ChatWidget> {
                   });
                   return null;
                 },
-                label: '',
+                label: 'Chat ',
               ),
             ],
           ),
