@@ -70,7 +70,7 @@ intl: ^0.17.0
 <h3> 10- Live screen With Web and using share screen  </h3>
 
 <p align="center">
-  <img src="screen/10_live_with_Web.png" width="300" hight=500  title="10- Live screen Web">
+  <img src="screen/10_live_with_Web.png" width="800" hight=600  title="10- Live screen Web">
 </p>
 
 ## Getting Started
