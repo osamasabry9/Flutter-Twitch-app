@@ -284,10 +284,9 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
               mobileBody: Column(
                 children: [
                   _renderVideo(user, isScreenSharing),
-                  if (isUser)
-                    const SizedBox(
-                      height: 10,
-                    ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   if (isUser)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -309,6 +308,10 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                         ),
                       ],
                     ),
+                  if (isUser)
+                    const SizedBox(
+                      height: 10,
+                    ),
                   Expanded(
                       child:
                           ChatWidget(channelId: widget.channelId, user: user)),
@@ -324,7 +327,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
   _renderVideo(user, isScreenSharing) {
     return AspectRatio(
       aspectRatio: 16 / 9,
-      child: "${user.uid}${user.username}" == widget.channelId
+      child: "${user.uId}${user.username}" == widget.channelId
           ? isScreenSharing
               ? kIsWeb
                   ? const RtcLocalView.SurfaceView.screenShare()

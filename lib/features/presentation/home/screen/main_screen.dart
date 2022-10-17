@@ -10,35 +10,24 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen>
-    with SingleTickerProviderStateMixin {
-  int _selectedIndex = 0;
-  TabController? _tabController;
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
+class _MainScreenState extends State<MainScreen> {
+  int _page = 0;
+  List<Widget> pages = const [
+    HomeScreen(),
+    GoLiveScreen(),
+    BrowserScreen(),
+  ];
 
-  onTapChange(int index) {
+  onPageChange(int page) {
     setState(() {
-      _selectedIndex = index;
-      _tabController!.index = _selectedIndex;
+      _page = page;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TabBarView(
-        controller: _tabController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          HomeScreen(),
-          GoLiveScreen(),
-          BrowserScreen(),
-        ],
-      ),
+      body: pages[_page],
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -57,8 +46,8 @@ class _MainScreenState extends State<MainScreen>
               ),
               label: 'Browse'),
         ],
-        currentIndex: _selectedIndex,
-        onTap: onTapChange,
+        onTap: onPageChange,
+        currentIndex: _page,
       ),
     );
   }

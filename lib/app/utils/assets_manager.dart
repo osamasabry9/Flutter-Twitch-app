@@ -6,4 +6,6 @@ class ImageAssets {
 
   static const String icon = '$IMAGE_PATH/icon.png';
   static const String welcome = '$IMAGE_PATH/welcome.svg';
+  static const String noData = '$IMAGE_PATH/empty.svg';
+
 }
